@@ -1,3 +1,6 @@
+# Cyber Incidents Explorer- .gitignore
+# Maintained by team members. 
+
 # ==== Python ====
 __pycache__/
 *.py[cod]
@@ -29,3 +32,11 @@ outputs/*.log
 # ==== OS Files ====
 .DS_Store
 Thumbs.db
+
+# === Cache & Environment ===
+*.log
+*.bak
+*.tmp
+__pycache__
+*.pkl
+*.json
