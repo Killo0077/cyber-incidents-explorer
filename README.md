@@ -24,7 +24,7 @@ reports/ -> Visual or textual analysis reports
 
 - Python 3.11 +
 - Git
-- (Optional) SQLite 3 or Docker
+- SQLite 3 or Docker
 
 ### Installation
 ```bash
