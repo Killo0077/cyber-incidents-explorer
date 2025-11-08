@@ -1,9 +1,4 @@
 pandas
-<<<<<<< HEAD
 python-dateutil
 sqlalchemy
 openpyxl
-=======
-pathlib
-sqlalchemy
->>>>>>> bcbd3d06141eabeb17cc13d8f9a40ed27ef8b2e4
