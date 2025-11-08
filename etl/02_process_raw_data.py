@@ -8,16 +8,18 @@ RAW_DIR = Path("data/raw")
 OUT_DIR = Path("outputs")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# Try to find the first raw file automatically
-candidates =[]
-for ext in ("*.CSV", "*.xlsx", "*.xls"):
+# Try to find the first raw file automatically (case-insensitive + deterministic)
+candidates = []
+for ext in ("*.csv", "*.CSV", "*.xlsx", "*.XLSX", "*.xls", "*.XLS"):
     candidates.extend(RAW_DIR.glob(ext))
 
 if not candidates:
-    raise FileNotFoundError("No raw data file found in data/raw (.csv/ .xlsx/ .xls)")
+    raise FileNotFoundError("No raw data file found in data/raw (.csv/.xlsx/.xls)")
 
-RAW_FILE = candidates[0]
-print(f'Using raw file: {RAW_FILE}')
+# Pick the most recently modified file
+RAW_FILE = max(candidates, key=lambda p: p.stat().st_mtime)
+print(f"Using raw file: {RAW_FILE}")
+
 
 # Load depending on extension
 if RAW_FILE.suffix.lower() == ".csv":
