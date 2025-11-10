@@ -20,10 +20,12 @@ if args.input:
     if not RAW_FILE.exists():
         raise FileNotFoundError(f"Input file not found: {RAW_FILE}")
 else:
+   # Try to find the raw file automatically (case-insensitive + deterministic)
     candidates = []
     for ext in ("*.csv", "*.CSV", "*.xlsx", "*.XLSX", "*.xls", "*.XLS"):
         candidates.extend(RAW_DIR.glob(ext))
     if not candidates:
+       # Pick the most recently modified file
         raise FileNotFoundError("No raw data file found in data/raw (.csv/.xlsx/.xls)")
     RAW_FILE = max(candidates, key=lambda p: p.stat().st_mtime)
 
