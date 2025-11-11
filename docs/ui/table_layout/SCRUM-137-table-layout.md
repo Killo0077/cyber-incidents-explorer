@@ -121,4 +121,9 @@ Add to `docs/ui/table_layout/` when ready:
 ##  Linked Work
 
 - **Parent Story:** SCRUM-7 “Display data in a table”  
-- **Next Task:** SCRUM-138 “Implement table component in the UI”  
+- **Next Task:** SCRUM-138 “Implement table component in the UI”
+
+---
+
+### Wireframe Screenshot
+![Table Layout Wireframe](./SCRUM-137-table-layout.png)
