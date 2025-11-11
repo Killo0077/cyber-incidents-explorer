@@ -40,3 +40,11 @@ Thumbs.db
 __pycache__
 *.pkl
 *.json
+# Local artifacts
+outputs/
+reports/
+data/raw/
+*.db
+*.sqlite
+.venv/
+__pycache__/
