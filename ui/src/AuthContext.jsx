@@ -12,6 +12,15 @@ const INITIAL_USERS = [
     lastName: "User", 
     email: "admin@example.com", 
     role: "admin"
+  },
+  {
+      id: 1, 
+    username: "analyst", 
+    password: "analyst", 
+    firstName: "Data analyst", 
+    lastName: "Data Analyst", 
+    email: "analyst@example.com", 
+    role: "analyst"
   }
 ];
 
