@@ -3,26 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import "./LoginPage.css";
 
-// Built-in credentials
-const VALID_USERS = {
-  admin: {
-    password: "admin",
-    role: "admin"
-  }
-};
-
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, users } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
 
-    const user = VALID_USERS[username];
+    const user = users.find(u => u.username === username);
     
     if (!user) {
       setError("User not found");
@@ -34,7 +26,7 @@ export default function LoginPage() {
       return;
     }
 
-    login(user.role);
+    login(username, user.role);
     navigate("/");
   };
 
@@ -75,12 +67,6 @@ export default function LoginPage() {
             Sign In
           </button>
         </form>
-
-        <div className="demo-credentials">
-          <p><strong>Demo Credentials:</strong></p>
-          <p>Username: <code>admin</code></p>
-          <p>Password: <code>admin</code></p>
-        </div>
       </div>
     </div>
   );
