@@ -1,56 +1,85 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
-import "./HomePage.css";
+import "./LoginPage.css";
+
+// Built-in credentials
+const VALID_USERS = {
+  admin: {
+    password: "admin",
+    role: "admin"
+  }
+};
 
 export default function LoginPage() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleLogin = (role) => {
-    login(role);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError("");
+
+    const user = VALID_USERS[username];
+    
+    if (!user) {
+      setError("User not found");
+      return;
+    }
+
+    if (user.password !== password) {
+      setError("Invalid password");
+      return;
+    }
+
+    login(user.role);
     navigate("/");
   };
 
   return (
-    <div className="main-content">
-      <div className="content-card">
+    <div className="login-container">
+      <div className="login-card">
         <h1>Cyber Security Events App</h1>
-        <h2>Select Your Role</h2>
-        <div style={{ display: "flex", gap: "1rem", justifyContent: "center", marginTop: "2rem" }}>
-          <button
-            onClick={() => handleLogin("admin")}
-            style={{
-              padding: "0.75rem 2rem",
-              fontSize: "1rem",
-              backgroundColor: "#667eea",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              transition: "background 0.3s ease"
-            }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = "#764ba2")}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = "#667eea")}
-          >
-            Admin
+        <h2>Login</h2>
+        
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              type="text"
+              placeholder="Enter username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          {error && <div className="error-message">{error}</div>}
+
+          <button type="submit" className="login-button">
+            Sign In
           </button>
-          <button
-            onClick={() => handleLogin("analyst")}
-            style={{
-              padding: "0.75rem 2rem",
-              fontSize: "1rem",
-              backgroundColor: "#667eea",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              transition: "background 0.3s ease"
-            }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = "#764ba2")}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = "#667eea")}
-          >
-            Analyst
-          </button>
+        </form>
+
+        <div className="demo-credentials">
+          <p><strong>Demo Credentials:</strong></p>
+          <p>Username: <code>admin</code></p>
+          <p>Password: <code>admin</code></p>
         </div>
       </div>
     </div>
