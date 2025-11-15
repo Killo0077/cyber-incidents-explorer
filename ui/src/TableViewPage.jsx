@@ -1,75 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import HomePage from "./HomePage";
-import ReportsPage from "./ReportsPage";
-import TableViewPage from "./TableViewPage";
-import PieChartView from "./PieChartView";
-import AccountsPage from "./AccountsPage";
-import "./App.css";
-
-export default function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/reports" element={<ReportsPage />} />
-        <Route path="/visualization/table" element={<TableViewPage />} />
-        <Route path="/visualization/pie-chart" element={<PieChartView />} />
-        <Route path="/accounts" element={<AccountsPage />} />
-      </Routes>
-    </Router>
-  );
-}
-
-// OLD TABLE VIEW CODE - NO LONGER USED
-/*
 import { useEffect, useMemo, useState } from "react";
 import Papa from "papaparse";
+import Navigation from "./Navigation";
+import TableView from "./TableView";
 
-// ==== CSV LOCATION ====
-// Put your CSV here: ui/public/data/cyber_clean.csv
-// (We'll use /data/cyber_clean.csv at runtime)
 const CSV_URL = "/data/cyber_clean.csv";
 
-function TableView({ rows }) {
-  if (!rows || !rows.length) return <div className="empty">No rows</div>;
-
-  const cols = [
-    "event_date", "actor", "actor_type",
-    "organization", "event_type", "country",
-    "description"
-  ].filter(c => c in rows[0]);
-
-  return (
-    <table className="table">
-      <thead>
-        <tr>
-          <th className="col-date">Date</th>
-          <th className="col-actor">Actor</th>
-          <th className="col-actor-type">Actor Type</th>
-          <th className="col-org">Organization</th>
-          <th className="col-etype">Event Type</th>
-          <th className="col-country">Country</th>
-          <th className="col-desc">Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((r, i) => (
-          <tr key={i}>
-            <td>{r.event_date ?? ""}</td>
-            <td>{r.actor ?? ""}</td>
-            <td>{r.actor_type ?? ""}</td>
-            <td>{r.organization ?? ""}</td>
-            <td>{r.event_type ?? ""}</td>
-            <td>{r.country ?? ""}</td>
-            <td><div className="clamp-2">{r.description ?? ""}</div></td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
-export default function App() {
+export default function TableViewPage() {
   const [raw, setRaw] = useState([]);
   const [q, setQ] = useState("");
   const [actor, setActor] = useState("");
@@ -124,10 +60,12 @@ export default function App() {
   useEffect(() => setPage(1), [q, actor, country, pageSize]);
 
   return (
-    <div className="page">
-      <h1>Cyber Events — Table</h1>
+    <div>
+      <Navigation />
+      <div className="page">
+        <h1>Cyber Events — Table</h1>
 
-      <div className="controls">
+        <div className="controls">
         <input
           placeholder="Search description or organization…"
           value={q}
@@ -156,7 +94,7 @@ export default function App() {
         <button onClick={() => setPage(p => Math.min(pages, p + 1))} disabled={page === pages}>Next ›</button>
         <button onClick={() => setPage(pages)} disabled={page === pages}>Last »</button>
       </div>
+      </div>
     </div>
   );
 }
-*/

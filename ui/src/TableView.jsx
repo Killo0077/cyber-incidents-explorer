@@ -68,27 +68,7 @@ export default function TableView({ rows }) {
   };
 
   return (
-    <div className="grid">
-      <h1>Cyber Events — Table</h1>
-
-      <div className="controls">
-        <input
-          placeholder="Search anything…"
-          value={query}
-          onChange={(e) => { setQuery(e.target.value); setPage(1); }}
-        />
-        <select
-          value={pageSize}
-          onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
-        >
-          {[10, 25, 50, 100].map((n) => (
-            <option key={n} value={n}>{n} / page</option>
-          ))}
-        </select>
-        <span>Rows: {total}</span>
-      </div>
-
-      <div className="table-wrap">
+    <div className="table-wrap">
         <table>
           <thead>
             <tr>
@@ -115,14 +95,5 @@ export default function TableView({ rows }) {
           </tbody>
         </table>
       </div>
-
-      <div className="pager">
-        <button onClick={() => setPage(1)} disabled={safePage === 1}>« First</button>
-        <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={safePage === 1}>‹ Prev</button>
-        <span>Page {safePage} / {pageCount}</span>
-        <button onClick={() => setPage((p) => Math.min(pageCount, p + 1))} disabled={safePage >= pageCount}>Next ›</button>
-        <button onClick={() => setPage(pageCount)} disabled={safePage >= pageCount}>Last »</button>
-      </div>
-    </div>
   );
 }
