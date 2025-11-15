@@ -91,3 +91,39 @@
   color: #667eea;
   font-weight: 600;
 }
+
+/* Export button */
+.export-button {
+  padding: 0.5rem 0.75rem; /* smaller */
+  background: #667eea;
+  color: #fff;
+  border: none;
+  border-radius: 3px; /* slightly smaller radius */
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem; /* smaller text */
+  align-self: flex-start; /* avoid stretching full width */
+  width: auto; /* keep compact width */
+}
+
+.export-button:hover {
+  background: #5563d6;
+}
+
+/* Ensure captured region has a white background for PDF */
+.report-capture {
+  background: #ffffff;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+/* Push export control to the right on the controls row */
+.export-group {
+  margin-left: auto; /* occupies the far right */
+  width: auto;      /* don't force 220px width */
+  align-items: flex-end; /* right-align inner items */
+}
+
+.export-group .export-button {
+  align-self: flex-end; /* ensure button is right-aligned inside the group */
+}
