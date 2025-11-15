@@ -7,14 +7,20 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetUsername, setResetUsername] = useState("");
+  const [resetPassword, setResetPassword] = useState("");
+  const [resetError, setResetError] = useState("");
+  const [resetSuccess, setResetSuccess] = useState("");
   const navigate = useNavigate();
-  const { login, users } = useAuth();
+  const { login, users, resetPassword: resetUserPassword } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
 
-    const user = users.find(u => u.username === username);
+    const needle = username.trim().toLowerCase();
+    const user = users.find(u => (u.username || "").toLowerCase() === needle);
     
     if (!user) {
       setError("User not found");
@@ -26,8 +32,44 @@ export default function LoginPage() {
       return;
     }
 
-    login(username, user.role);
+    // use stored username casing
+    login(user.username, user.role);
     navigate("/");
+  };
+
+  const handleForgotPasswordClick = () => {
+    setShowForgotPassword(true);
+    setResetUsername("");
+    setResetPassword("");
+    setResetError("");
+    setResetSuccess("");
+  };
+
+  const handleResetPassword = (e) => {
+    e.preventDefault();
+    setResetError("");
+    setResetSuccess("");
+
+    if (!resetUsername) {
+      setResetError("Please enter your username");
+      return;
+    }
+    if (!resetPassword) {
+      setResetError("Please enter a new password");
+      return;
+    }
+
+    const result = resetUserPassword(resetUsername, resetPassword);
+    if (result.success) {
+      setResetSuccess(result.message);
+      setTimeout(() => {
+        setShowForgotPassword(false);
+        setResetUsername("");
+        setResetPassword("");
+      }, 1200);
+    } else {
+      setResetError(result.message);
+    }
   };
 
   return (
@@ -66,8 +108,66 @@ export default function LoginPage() {
           <button type="submit" className="login-button">
             Sign In
           </button>
+
+          <div className="forgot-password-link">
+            <button
+              type="button"
+              onClick={handleForgotPasswordClick}
+              className="link-button"
+            >
+              Forgot Password?
+            </button>
+          </div>
         </form>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <div className="modal-overlay" onClick={() => setShowForgotPassword(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2>Reset Password</h2>
+            <div className="modal-body">
+              <form onSubmit={handleResetPassword}>
+                <div className="form-group">
+                  <label htmlFor="reset-username">Username</label>
+                  <input
+                    id="reset-username"
+                    type="text"
+                    placeholder="Enter your username"
+                    value={resetUsername}
+                    onChange={(e) => setResetUsername(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="new-password">New Password</label>
+                  <input
+                    id="new-password"
+                    type="password"
+                    placeholder="Enter new password"
+                    value={resetPassword}
+                    onChange={(e) => setResetPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                {resetError && <div className="error-message">{resetError}</div>}
+                {resetSuccess && <div className="success-message">{resetSuccess}</div>}
+                <button type="submit" className="login-button" style={{ marginTop: "1rem" }}>
+                  Reset Password
+                </button>
+              </form>
+            </div>
+            <div className="modal-footer">
+              <button
+                className="link-button"
+                onClick={() => setShowForgotPassword(false)}
+              >
+                Back to Login
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
