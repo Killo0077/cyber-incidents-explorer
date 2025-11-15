@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 
 const AuthContext = createContext();
 
@@ -19,12 +19,56 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [users, setUsers] = useState(INITIAL_USERS);
 
+  const STORAGE_KEY_USERS = "cie_users";
+  const STORAGE_KEY_SESSION = "cie_session";
+
+  // Load users and session from localStorage on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_USERS);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length) setUsers(parsed);
+      }
+    } catch (e) {
+      // ignore parse errors and keep INITIAL_USERS
+      // console.warn("Failed to load users from storage", e);
+    }
+
+    try {
+      const sess = localStorage.getItem(STORAGE_KEY_SESSION);
+      if (sess) {
+        setUser(JSON.parse(sess));
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
+  // Persist users to localStorage whenever users change
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users));
+    } catch (e) {
+      // ignore write errors
+    }
+  }, [users]);
+
   const login = (username, role) => {
-    setUser({ username, role });
+    const u = { username, role };
+    setUser(u);
+    try {
+      localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(u));
+    } catch (e) {
+      // ignore
+    }
   };
 
   const logout = () => {
     setUser(null);
+    try {
+      localStorage.removeItem(STORAGE_KEY_SESSION);
+    } catch (e) {}
   };
 
   const addUser = (username, password, firstName, lastName, email, role) => {

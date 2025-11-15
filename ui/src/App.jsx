@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./AuthContext";
 import ProtectedRoute from "./ProtectedRoute";
 import LoginPage from "./LoginPage";
+import SignupPage from "./SignupPage";
 import HomePage from "./HomePage";
 import ReportsPage from "./ReportsPage";
 import TableViewPage from "./TableViewPage";
@@ -15,6 +16,7 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
           <Route path="/" element={<ProtectedRoute element={<HomePage />} allowedRoles={["admin", "analyst"]} />} />
           <Route path="/reports" element={<ProtectedRoute element={<ReportsPage />} allowedRoles={["admin", "analyst"]} />} />
           <Route path="/visualization/table" element={<ProtectedRoute element={<TableViewPage />} allowedRoles={["admin", "analyst"]} />} />
