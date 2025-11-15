@@ -4,7 +4,15 @@ const AuthContext = createContext();
 
 // Initial users list with the built-in admin user
 const INITIAL_USERS = [
-  { id: 1, username: "admin", password: "admin", firstName: "Admin", lastName: "User", email: "admin@example.com", role: "admin" }
+  { 
+    id: 1, 
+    username: "admin", 
+    password: "admin", 
+    firstName: "Admin", 
+    lastName: "User", 
+    email: "admin@example.com", 
+    role: "admin"
+  }
 ];
 
 export function AuthProvider({ children }) {
@@ -39,6 +47,17 @@ export function AuthProvider({ children }) {
     ));
   };
 
+  // Mocked password reset: simply set the new password for the username (no security question)
+  const resetPassword = (username, newPassword) => {
+    const user = users.find(u => u.username === username);
+    if (!user) return { success: false, message: "User not found" };
+
+    setUsers(users.map(u =>
+      u.id === user.id ? { ...u, password: newPassword } : u
+    ));
+    return { success: true, message: "Password reset successfully" };
+  };
+
   const deleteUser = (id) => {
     setUsers(users.filter(u => u.id !== id));
   };
@@ -48,7 +67,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, users, addUser, updateUser, deleteUser, getUser }}>
+    <AuthContext.Provider value={{ user, login, logout, users, addUser, updateUser, deleteUser, getUser, resetPassword }}>
       {children}
     </AuthContext.Provider>
   );
