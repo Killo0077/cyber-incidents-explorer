@@ -1,4 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./AuthContext";
+import ProtectedRoute from "./ProtectedRoute";
+import LoginPage from "./LoginPage";
 import HomePage from "./HomePage";
 import ReportsPage from "./ReportsPage";
 import TableViewPage from "./TableViewPage";
@@ -9,13 +12,16 @@ import "./App.css";
 export default function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/reports" element={<ReportsPage />} />
-        <Route path="/visualization/table" element={<TableViewPage />} />
-        <Route path="/visualization/pie-chart" element={<PieChartView />} />
-        <Route path="/accounts" element={<AccountsPage />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<ProtectedRoute element={<HomePage />} allowedRoles={["admin", "analyst"]} />} />
+          <Route path="/reports" element={<ProtectedRoute element={<ReportsPage />} allowedRoles={["admin", "analyst"]} />} />
+          <Route path="/visualization/table" element={<ProtectedRoute element={<TableViewPage />} allowedRoles={["admin", "analyst"]} />} />
+          <Route path="/visualization/pie-chart" element={<ProtectedRoute element={<PieChartView />} allowedRoles={["admin", "analyst"]} />} />
+          <Route path="/accounts" element={<ProtectedRoute element={<AccountsPage />} allowedRoles={["admin"]} />} />
+        </Routes>
+      </AuthProvider>
     </Router>
   );
 }

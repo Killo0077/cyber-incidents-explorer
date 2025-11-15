@@ -1,11 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef } from "react";
+import { useAuth } from "./AuthContext";
 import "./Navigation.css";
 
 export default function Navigation() {
   const [vizDropdownOpen, setVizDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const closeTimeoutRef = useRef(null);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleMouseEnter = () => {
     if (closeTimeoutRef.current) {
@@ -18,6 +21,11 @@ export default function Navigation() {
     closeTimeoutRef.current = setTimeout(() => {
       setVizDropdownOpen(false);
     }, 150); // 150ms delay
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
   };
 
   return (
@@ -41,7 +49,28 @@ export default function Navigation() {
               </ul>
             )}
           </li>
-          <li><Link to="/accounts">User Management</Link></li>
+          {user?.role === "admin" && (
+            <li><Link to="/accounts">User Management</Link></li>
+          )}
+          <li>
+            <button
+              onClick={handleLogout}
+              style={{
+                background: "none",
+                border: "none",
+                color: "white",
+                cursor: "pointer",
+                fontSize: "1rem",
+                fontWeight: "500",
+                padding: 0,
+                transition: "opacity 0.3s ease"
+              }}
+              onMouseEnter={(e) => (e.target.style.opacity = "0.8")}
+              onMouseLeave={(e) => (e.target.style.opacity = "1")}
+            >
+              Logout ({user?.role})
+            </button>
+          </li>
         </ul>
       </div>
     </nav>
