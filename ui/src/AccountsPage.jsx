@@ -4,7 +4,7 @@ import { useAuth } from "./AuthContext";
 import "./AccountsPage.css";
 
 export default function AccountsPage() {
-  const { users, updateUser, deleteUser, addUser } = useAuth();
+  const { users, updateUser, deleteUser, addUser, changePassword } = useAuth();
   const [viewingUser, setViewingUser] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
   const [addingUser, setAddingUser] = useState(false);
@@ -16,6 +16,11 @@ export default function AccountsPage() {
     email: "",
     role: "analyst" 
   });
+  const [pwChangeTarget, setPwChangeTarget] = useState(null);
+  const [pwOld, setPwOld] = useState("");
+  const [pwNew, setPwNew] = useState("");
+  const [pwError, setPwError] = useState("");
+  const [pwSuccess, setPwSuccess] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(null);
 
   const handleView = (user) => {
@@ -58,15 +63,20 @@ export default function AccountsPage() {
   };
 
   const handleSaveUser = () => {
-    if (!formData.username || !formData.password || !formData.firstName || !formData.lastName || !formData.email) {
-      alert("All fields are required");
-      return;
-    }
-
     if (editingUser) {
-      updateUser(editingUser.id, formData.username, formData.password, formData.firstName, formData.lastName, formData.email, formData.role);
+      if (!formData.username || !formData.firstName || !formData.lastName || !formData.email) {
+        alert("All fields except password are required");
+        return;
+      }
+      // keep existing password unless changed via the password change flow
+      const passwordToUse = formData.password || editingUser.password;
+      updateUser(editingUser.id, formData.username, passwordToUse, formData.firstName, formData.lastName, formData.email, formData.role);
       setEditingUser(null);
     } else if (addingUser) {
+      if (!formData.username || !formData.password || !formData.firstName || !formData.lastName || !formData.email) {
+        alert("All fields are required");
+        return;
+      }
       addUser(formData.username, formData.password, formData.firstName, formData.lastName, formData.email, formData.role);
       setAddingUser(false);
     }
@@ -122,28 +132,21 @@ export default function AccountsPage() {
                       >
                         View
                       </button>
-                      <button
-                        className="btn btn-sm btn-warning"
-                        onClick={() => handleEdit(user)}
-                      >
-                        Edit
-                      </button>
                       {user.username !== "admin" && (
-                        <button
-                          className="btn btn-sm btn-danger"
-                          onClick={() => handleDelete(user)}
-                        >
-                          Delete
-                        </button>
-                      )}
-                      {user.username === "admin" && (
-                        <span
-                          className="btn btn-sm btn-danger"
-                          style={{ opacity: 0.5, cursor: "not-allowed" }}
-                          title="Admin user cannot be deleted"
-                        >
-                          Delete
-                        </span>
+                        <>
+                          <button
+                            className="btn btn-sm btn-warning"
+                            onClick={() => handleEdit(user)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="btn btn-sm btn-danger"
+                            onClick={() => handleDelete(user)}
+                          >
+                            Delete
+                          </button>
+                        </>
                       )}
                     </td>
                   </tr>
@@ -246,13 +249,21 @@ export default function AccountsPage() {
                 </div>
                 <div className="form-group">
                   <label htmlFor="password">Password</label>
-                  <input
-                    id="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    placeholder="Enter password"
-                  />
+                  {editingUser ? (
+                    <div>
+                      <button className="link-button" onClick={() => { setPwChangeTarget(editingUser); setPwOld(""); setPwNew(""); setPwError(""); setPwSuccess(""); }}>
+                        Change password
+                      </button>
+                    </div>
+                  ) : (
+                    <input
+                      id="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      placeholder="Enter password"
+                    />
+                  )}
                 </div>
                 <div className="form-group">
                   <label htmlFor="role">Role</label>
@@ -297,6 +308,45 @@ export default function AccountsPage() {
                 <button className="btn btn-danger" onClick={confirmDeleteUser}>
                   Delete
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Password Change Modal */}
+        {pwChangeTarget && (
+          <div className="modal-overlay" onClick={() => setPwChangeTarget(null)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <h2>Change Password for {pwChangeTarget.username}</h2>
+              <div className="modal-body">
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  setPwError("");
+                  setPwSuccess("");
+                  const result = changePassword(pwChangeTarget.id, pwOld, pwNew);
+                  if (result.success) {
+                    setPwSuccess(result.message);
+                    // close after short delay
+                    setTimeout(() => setPwChangeTarget(null), 900);
+                  } else {
+                    setPwError(result.message);
+                  }
+                }}>
+                  <div className="form-group">
+                    <label htmlFor="old-password">Old Password</label>
+                    <input id="old-password" type="password" value={pwOld} onChange={(e) => setPwOld(e.target.value)} placeholder="Enter old password" />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="new-password">New Password</label>
+                    <input id="new-password" type="password" value={pwNew} onChange={(e) => setPwNew(e.target.value)} placeholder="Enter new password" />
+                  </div>
+                  {pwError && <div className="error-message">{pwError}</div>}
+                  {pwSuccess && <div className="success-message">{pwSuccess}</div>}
+                  <div className="modal-footer">
+                    <button className="btn btn-secondary" type="button" onClick={() => setPwChangeTarget(null)}>Cancel</button>
+                    <button className="btn btn-primary" type="submit">Change Password</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

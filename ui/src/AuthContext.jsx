@@ -91,6 +91,27 @@ export function AuthProvider({ children }) {
     ));
   };
 
+  // Change password with old password verification for non-admins.
+  // Admins can change any user's password without providing the old password.
+  const changePassword = (id, oldPassword, newPassword) => {
+    const target = users.find(u => u.id === id);
+    if (!target) return { success: false, message: "User not found" };
+
+    // If current session user is admin, allow bypassing old password
+    if (user && user.role === "admin") {
+      setUsers(users.map(u => u.id === id ? { ...u, password: newPassword } : u));
+      return { success: true, message: "Password changed" };
+    }
+
+    // Otherwise require old password match
+    if (target.password !== oldPassword) {
+      return { success: false, message: "Old password is incorrect" };
+    }
+
+    setUsers(users.map(u => u.id === id ? { ...u, password: newPassword } : u));
+    return { success: true, message: "Password changed" };
+  };
+
   // Mocked password reset: simply set the new password for the username (no security question)
   const resetPassword = (username, newPassword) => {
     const user = users.find(u => u.username === username);
@@ -111,7 +132,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, users, addUser, updateUser, deleteUser, getUser, resetPassword }}>
+    <AuthContext.Provider value={{ user, login, logout, users, addUser, updateUser, deleteUser, getUser, resetPassword, changePassword }}>
       {children}
     </AuthContext.Provider>
   );

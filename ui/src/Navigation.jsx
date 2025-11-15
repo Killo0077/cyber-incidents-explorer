@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import "./Navigation.css";
 
@@ -28,6 +28,22 @@ export default function Navigation() {
     navigate("/login");
   };
 
+  // User menu dropdown state
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
+
+  // Close user menu on outside click
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    function handleClick(e) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setUserMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [userMenuOpen]);
+
   return (
     <nav className="navbar">
       <div className="navbar-content">
@@ -35,7 +51,7 @@ export default function Navigation() {
         <ul className="navbar-links">
           <li><Link to="/">Home</Link></li>
           <li><Link to="/reports">Reports</Link></li>
-          <li 
+          <li
             ref={dropdownRef}
             className="navbar-dropdown"
             onMouseEnter={handleMouseEnter}
@@ -52,25 +68,60 @@ export default function Navigation() {
           {user?.role === "admin" && (
             <li><Link to="/accounts">User Management</Link></li>
           )}
-          <li>
-            <button
-              onClick={handleLogout}
-              style={{
-                background: "none",
-                border: "none",
-                color: "white",
-                cursor: "pointer",
-                fontSize: "1rem",
-                fontWeight: "500",
-                padding: 0,
-                transition: "opacity 0.3s ease"
-              }}
-              onMouseEnter={(e) => (e.target.style.opacity = "0.8")}
-              onMouseLeave={(e) => (e.target.style.opacity = "1")}
+          {user && (
+            <li
+              className="navbar-dropdown user-dropdown"
+              ref={userMenuRef}
+              style={{ position: "relative" }}
             >
-              Logout ({user?.role})
-            </button>
-          </li>
+              <button
+                className="user-menu-trigger"
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "white",
+                  fontWeight: 500,
+                  fontSize: "1rem",
+                  cursor: "pointer",
+                  padding: "0.25rem 1.2rem 0.25rem 1.2rem",
+                  borderRadius: "4px"
+                }}
+                onClick={() => setUserMenuOpen((open) => !open)}
+                aria-haspopup="true"
+                aria-expanded={userMenuOpen}
+              >
+                {user.username}
+                <span style={{ marginLeft: 8, fontSize: "0.9em" }}>▼</span>
+              </button>
+              {userMenuOpen && (
+                <ul className="navbar-submenu user-menu" style={{ minWidth: 180, right: 0, left: "auto", marginTop: 8, padding: 0 }}>
+                  <li style={{ padding: 0, margin: 0 }}>
+                    <Link to="/change-password" style={{ padding: "0.75rem 1.5rem", display: "block", color: "white", textDecoration: "none", fontWeight: 400, fontSize: "1rem" }} onClick={() => setUserMenuOpen(false)}>
+                      Change Password
+                    </Link>
+                  </li>
+                  <li style={{ padding: 0, margin: 0 }}>
+                    <button
+                      onClick={() => { setUserMenuOpen(false); handleLogout(); }}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "white",
+                        cursor: "pointer",
+                        fontSize: "1rem",
+                        fontWeight: 400,
+                        padding: "0.75rem 1.5rem",
+                        width: "100%",
+                        textAlign: "left"
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </li>
+                </ul>
+              )}
+            </li>
+          )}
         </ul>
       </div>
     </nav>
