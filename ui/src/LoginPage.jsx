@@ -45,6 +45,10 @@ export default function LoginPage() {
     setResetSuccess("");
   };
 
+  const handleGoSignup = () => {
+    navigate("/signup");
+  };
+
   const handleResetPassword = (e) => {
     e.preventDefault();
     setResetError("");
@@ -116,6 +120,11 @@ export default function LoginPage() {
               className="link-button"
             >
               Forgot Password?
+            </button>
+          </div>
+          <div style={{ textAlign: "center", marginTop: "0.5rem" }}>
+            <button type="button" className="link-button" onClick={handleGoSignup}>
+              Don't have an account? Sign up
             </button>
           </div>
         </form>
